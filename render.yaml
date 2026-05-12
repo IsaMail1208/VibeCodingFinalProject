@@ -10,9 +10,3 @@ services:
     envVars:
       - key: PYTHONUNBUFFERED
         value: "1"
-      - key: DATA_DIR
-        value: /var/data
-    disk:
-      name: vibe-chat-data
-      mountPath: /var/data
-      sizeGB: 1
