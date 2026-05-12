@@ -45,12 +45,12 @@ docker run -p 8000:8000 vibe-chat
 
 ## Ссылка на живой сайт
 
-_Вставьте сюда ссылку после деплоя (Render, Railway, Fly.io и т.д.):_  
-**https://your-app.onrender.com** (замените на реальную)
+_TODO: замените на реальную ссылку после деплоя (Render и т.д.):_  
+**https://your-app.onrender.com**
 
 ## Ссылка на демо-видео (YouTube)
 
-_После записи 2–3 минут вставьте ссылку:_  
+_TODO: после записи 2–3 минут вставьте ссылку:_  
 **https://www.youtube.com/watch?v=...**
 
 ## Скриншоты
@@ -62,6 +62,34 @@ _Добавьте изображения в репозиторий (наприм
 - Публичный репозиторий GitHub с полным кодом  
 - Письмо на **kyrgyzstanait@gmail.com**, тема: `Vibe Coding Final Project – Ваше ФИО`  
 - Соблюдение дедлайна из задания
+
+## GitHub (публикация)
+
+В этом проекте уже есть `.gitignore`. Если вы ещё не залили код на GitHub:
+
+```powershell
+cd "c:\Users\user\Desktop\Salymbekov University\2 курс\Vibe coding"
+
+# 1) На GitHub создайте пустой репозиторий (Public)
+# 2) Привяжите remote и отправьте код
+git remote add origin https://github.com/<username>/<repo>.git
+git branch -M main
+git push -u origin main
+```
+
+Если GitHub попросит авторизацию — используйте GitHub CLI или Personal Access Token.
+
+## Render (деплой)
+
+Вариант 1 — как Python Web Service (без Docker):
+
+- **Build Command**: `pip install -r requirements.txt`
+- **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+
+Вариант 2 — Docker (если хотите деплоить контейнер):
+
+- Render сам соберёт Dockerfile
+- Порт берётся из переменной `PORT` (см. `Dockerfile`)
 
 ## API (кратко)
 
