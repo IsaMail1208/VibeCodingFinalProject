@@ -21,6 +21,12 @@ class User(Base):
         back_populates="sender",
     )
 
+    messages_received: Mapped[list["Message"]] = relationship(
+        "Message",
+        foreign_keys="Message.receiver_id",
+        back_populates="receiver",
+    )
+
 
 class Message(Base):
     __tablename__ = "messages"
@@ -32,3 +38,5 @@ class Message(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     sender: Mapped["User"] = relationship("User", foreign_keys=[sender_id], back_populates="messages_sent")
+
+    receiver: Mapped["User"] = relationship("User", foreign_keys=[receiver_id], back_populates="messages_received")

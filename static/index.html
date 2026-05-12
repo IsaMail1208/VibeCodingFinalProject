@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -11,56 +11,75 @@
       <header class="topbar">
         <h1>Vibe Chat</h1>
         <div class="topbar-actions">
-          <button type="button" id="themeToggle" class="btn ghost" aria-label="Тема">
-            Тема
+          <button type="button" id="logoutBtn" class="btn ghost" hidden>Logout</button>
+          <button type="button" id="themeToggle" class="btn ghost" aria-label="Theme">
+            Theme
           </button>
         </div>
       </header>
 
-      <main class="layout">
+      <!-- AUTH SCREEN (shown when not logged in) -->
+      <main id="authScreen" class="layout single">
+        <section class="panel auth-panel">
+          <h2>Welcome</h2>
+          <p class="hint">Log in to an existing account, or create a new one.</p>
+
+          <div class="auth-grid">
+            <div>
+              <h3>Log in</h3>
+              <form id="loginForm" class="stack">
+                <input name="identifier" placeholder="Username or email" required />
+                <button type="submit" class="btn primary">Log in</button>
+              </form>
+              <p id="loginStatus" class="hint"></p>
+            </div>
+
+            <div>
+              <h3>Register</h3>
+              <form id="registerForm" class="stack">
+                <input name="username" placeholder="Username" required minlength="1" />
+                <input name="email" type="email" placeholder="Email" required />
+                <input name="password" type="password" placeholder="Password" required minlength="4" />
+                <button type="submit" class="btn primary">Create account</button>
+              </form>
+              <p id="registerStatus" class="hint"></p>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- CHAT SCREEN (shown when logged in) -->
+      <main id="chatScreen" class="layout" hidden>
         <section class="panel users-panel">
-          <h2>Пользователи</h2>
-          <div class="register-block">
-            <h3>Регистрация</h3>
-            <form id="registerForm" class="stack">
-              <input name="username" placeholder="Имя пользователя" required minlength="1" />
-              <input name="email" type="email" placeholder="Email" required />
-              <input name="password" type="password" placeholder="Пароль" required minlength="4" />
-              <button type="submit" class="btn primary">Зарегистрироваться</button>
-            </form>
-            <p id="registerStatus" class="hint"></p>
-          </div>
-          <div class="login-block">
-            <h3>Войти как</h3>
-            <p class="hint"><strong>Ctrl+клик</strong> по себе в списке — «это я». Обычный клик по другому пользователю — открыть чат.</p>
-          </div>
+          <h2>Users</h2>
           <div class="search-row">
-            <input id="userSearch" type="search" placeholder="Поиск пользователей…" />
-            <button type="button" id="refreshUsers" class="btn ghost">Обновить</button>
+            <input id="userSearch" type="search" placeholder="Search users…" />
+            <button type="button" id="refreshUsers" class="btn ghost">Refresh</button>
           </div>
           <ul id="userList" class="user-list"></ul>
+          <p class="hint">Click a user to open a 1:1 chat.</p>
         </section>
 
         <section class="panel chat-panel">
-          <h2>Чат</h2>
-          <p id="chatPeerLabel" class="hint">Выберите собеседника слева</p>
+          <h2>Chat</h2>
+          <p id="chatPeerLabel" class="hint">Pick a user on the left</p>
           <div class="search-row">
-            <input id="messageSearch" type="search" placeholder="Поиск в переписке…" />
-            <button type="button" id="applyMsgSearch" class="btn ghost">Искать</button>
-            <button type="button" id="clearMsgSearch" class="btn ghost">Сброс</button>
+            <input id="messageSearch" type="search" placeholder="Search this conversation…" />
+            <button type="button" id="applyMsgSearch" class="btn ghost">Search</button>
+            <button type="button" id="clearMsgSearch" class="btn ghost">Clear</button>
           </div>
           <div id="chatWindow" class="chat-window" aria-live="polite"></div>
           <form id="sendForm" class="composer">
             <textarea
               id="messageInput"
               rows="2"
-              placeholder="Сообщение (поддерживаются эмодзи 🙂)"
+              placeholder="Message (emoji supported 🙂)"
               maxlength="8000"
               disabled
             ></textarea>
-            <button type="submit" class="btn primary" id="sendBtn" disabled>Отправить</button>
+            <button type="submit" class="btn primary" id="sendBtn" disabled>Send</button>
           </form>
-          <p id="typingHint" class="hint typing-hint" hidden>Печатает…</p>
+          <p id="typingHint" class="hint typing-hint" hidden>Typing…</p>
         </section>
       </main>
     </div>

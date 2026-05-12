@@ -1,24 +1,24 @@
 # Vibe Chat
 
-Короткое описание: учебный веб-чат с REST API на **FastAPI**, хранением в **SQLite** и простым фронтендом (HTML/CSS/JS). Подходит для финального проекта курса Vibe Coding.
+Short description: a simple educational chat website with a **FastAPI** REST API, **SQLite** storage, and a minimal HTML/CSS/JS frontend. Built for the Vibe Coding final project.
 
-## Возможности
+## Features
 
-- Регистрация пользователя, список пользователей, поиск по имени или email
-- Отправка и получение сообщений (личный чат 1:1), история переписки
-- Поиск по тексту в текущей переписке; фильтрация сообщений по отправителю, получателю и паре пользователей через API
-- Веб-интерфейс: список пользователей, поле ввода, окно чата, опрос новых сообщений
-- Дополнительно: тёмная тема, индикатор «печатает…», поддержка эмодзи в тексте, **Docker**
+- User registration, user list, user search (by username/email)
+- 1:1 messaging, chat history
+- Message search inside a conversation; API filters by sender/receiver/conversation
+- Web UI: login/register screen, user list, chat window, message polling
+- Extras: dark mode, “typing…” hint, emoji support, **Docker**
 
-## Технологии
+## Tech Stack
 
-- Python 3.12+, FastAPI, Uvicorn  
-- SQLAlchemy 2, SQLite  
-- Pydantic, passlib (pbkdf2_sha256)  
-- Фронтенд: статические файлы без сборщика  
-- Тесты: pytest, httpx (TestClient)
+- Python 3.12+, FastAPI, Uvicorn
+- SQLAlchemy 2, SQLite
+- Pydantic, passlib (pbkdf2_sha256)
+- Frontend: static files (no bundler)
+- Tests: pytest, httpx (TestClient)
 
-## Как запустить локально
+## Run Locally
 
 ```powershell
 cd "c:\Users\user\Desktop\Salymbekov University\2 курс\VibeCodingFinalProject"
@@ -30,7 +30,9 @@ uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 
 Откройте в браузере: `http://127.0.0.1:8000/`
 
-Тесты:
+Open in browser: `http://127.0.0.1:8000/`
+
+Tests:
 
 ```powershell
 pytest -q
@@ -43,27 +45,27 @@ docker build -t vibe-chat .
 docker run -p 8000:8000 vibe-chat
 ```
 
-## Ссылка на живой сайт
+## Live Website
 
-_TODO: замените на реальную ссылку после деплоя (Render и т.д.):_  
+_TODO: replace with the real link after deployment (Render, etc.):_
 **https://your-app.onrender.com**
 
-## Ссылка на демо-видео (YouTube)
+## Demo Video (YouTube)
 
-_TODO: после записи 2–3 минут вставьте ссылку:_  
+_TODO: after recording a 2–3 minute demo, paste the link:_
 **https://www.youtube.com/watch?v=...**
 
-## Скриншоты
+## Screenshots
 
-_Добавьте изображения в репозиторий (например, `docs/screenshot.png`) и вставьте ссылки сюда._
+_Add images to the repo (for example `docs/screenshot.png`) and link them here._
 
-## Сдача проекта
+## Submission
 
-- Публичный репозиторий GitHub с полным кодом  
-- Письмо на **kyrgyzstanait@gmail.com**, тема: `Vibe Coding Final Project – Ваше ФИО`  
-- Соблюдение дедлайна из задания
+- Public GitHub repository with the full source code
+- Email to **kyrgyzstanait@gmail.com** with subject: `Vibe Coding Final Project – Your Full Name`
+- Follow the deadline from the assignment
 
-## GitHub (публикация)
+## GitHub (publish)
 
 В этом проекте уже есть `.gitignore`. Если вы ещё не залили код на GitHub:
 
@@ -79,30 +81,25 @@ git push -u origin main
 
 Если GitHub попросит авторизацию — используйте GitHub CLI или Personal Access Token.
 
-## Render (деплой)
+## Render (deploy)
 
-Рекомендуемый вариант — **Blueprint** через файл `render.yaml` (он уже добавлен в репозиторий):
+Recommended option — **Blueprint** using `render.yaml` (already included in this repo):
 
-1) Залейте код на GitHub (публичный репозиторий)
-2) Откройте Render → **New** → **Blueprint**
-3) Выберите ваш репозиторий и подтвердите создание сервиса
-4) После деплоя откройте сайт и проверьте `/api/health`
+1) Push the code to GitHub (public repository)
+2) Open Render → **New** → **Blueprint**
+3) Select your repository and confirm
+4) After deploy, open the site and check `/api/health`
 
-Если билд падает на `pydantic-core`/Rust: убедитесь, что в Render используется Python 3.12+ с готовыми wheels. В `render.yaml` уже задано `PYTHON_VERSION=3.12.3`.
+If the build fails on `pydantic-core` / Rust: make sure Render uses a stable Python with prebuilt wheels. This repo pins `PYTHON_VERSION=3.12.3` in `render.yaml`.
 
-Примечание про SQLite: на Render файловая система контейнера может быть временной, поэтому данные могут сбрасываться при пересборке/перезапуске. Если нужна сохранность данных — подключите **persistent disk** в Render и задайте переменную `DATA_DIR` (или используйте внешний Postgres).
+SQLite note: Render’s filesystem may be ephemeral, so data can reset after rebuild/redeploy. If you need persistence, attach a **persistent disk** and set `DATA_DIR`, or use a managed Postgres.
 
-Вариант 1 — как Python Web Service (без Docker):
+Manual setup (without Blueprint):
 
 - **Build Command**: `pip install -r requirements.txt`
 - **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
 
-Вариант 2 — Docker (если хотите деплоить контейнер):
-
-- Render сам соберёт Dockerfile
-- Порт берётся из переменной `PORT` (см. `Dockerfile`)
-
-## API (кратко)
+## API (quick reference)
 
 | Метод | Путь | Описание |
 |--------|------|-----------|

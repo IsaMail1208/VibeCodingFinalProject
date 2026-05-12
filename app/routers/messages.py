@@ -1,12 +1,24 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import and_, or_
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app.database import get_db
 from app.models import Message, User
 from app.schemas import MessageCreate, MessageOut
 
 router = APIRouter(prefix="/api/messages", tags=["messages"])
+
+
+def to_message_out(msg: Message) -> MessageOut:
+    return MessageOut(
+        id=msg.id,
+        sender_id=msg.sender_id,
+        receiver_id=msg.receiver_id,
+        sender_username=getattr(getattr(msg, "sender", None), "username", None),
+        receiver_username=getattr(getattr(msg, "receiver", None), "username", None),
+        content=msg.content,
+        created_at=msg.created_at,
+    )
 
 
 @router.post("", response_model=MessageOut, status_code=201)
@@ -25,10 +37,13 @@ def send_message(payload: MessageCreate, db: Session = Depends(get_db)):
         receiver_id=payload.receiver_id,
         content=content,
     )
+    # attach loaded users so serializer can include usernames without extra queries
+    msg.sender = sender
+    msg.receiver = receiver
     db.add(msg)
     db.commit()
     db.refresh(msg)
-    return msg
+    return to_message_out(msg)
 
 
 @router.get("/conversation/{user_a}/{user_b}", response_model=list[MessageOut])
@@ -39,15 +54,20 @@ def conversation_history(
     db: Session = Depends(get_db),
 ):
     """All messages between two users (both directions), oldest first."""
-    q = db.query(Message).filter(
+    q = (
+        db.query(Message)
+        .options(selectinload(Message.sender), selectinload(Message.receiver))
+        .filter(
         or_(
             and_(Message.sender_id == user_a, Message.receiver_id == user_b),
             and_(Message.sender_id == user_b, Message.receiver_id == user_a),
         )
     )
+    )
     if search and search.strip():
         q = q.filter(Message.content.ilike(f"%{search.strip()}%"))
-    return q.order_by(Message.created_at.asc()).all()
+    rows = q.order_by(Message.created_at.asc()).all()
+    return [to_message_out(m) for m in rows]
 
 
 @router.get("", response_model=list[MessageOut])
@@ -63,7 +83,7 @@ def list_messages(
     limit: int = Query(200, ge=1, le=500),
     db: Session = Depends(get_db),
 ):
-    q = db.query(Message)
+    q = db.query(Message).options(selectinload(Message.sender), selectinload(Message.receiver))
     if user_a is not None and user_b is not None:
         q = q.filter(
             or_(
@@ -79,4 +99,4 @@ def list_messages(
     if search and search.strip():
         q = q.filter(Message.content.ilike(f"%{search.strip()}%"))
     rows = q.order_by(Message.created_at.asc()).limit(limit).all()
-    return rows
+    return [to_message_out(m) for m in rows]

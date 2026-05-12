@@ -1,10 +1,12 @@
 const API = "";
 
 let currentUserId = null;
+let currentUsername = null;
 let peerUserId = null;
 let pollTimer = null;
 let msgSearch = "";
 let typingTimer = null;
+let usersCache = [];
 
 const $ = (id) => document.getElementById(id);
 
@@ -27,12 +29,45 @@ function initTheme() {
   });
 }
 
+function saveSession(user) {
+  localStorage.setItem("currentUserId", String(user.id));
+  localStorage.setItem("currentUsername", user.username);
+  currentUserId = user.id;
+  currentUsername = user.username;
+}
+
+function clearSession() {
+  localStorage.removeItem("currentUserId");
+  localStorage.removeItem("currentUsername");
+  currentUserId = null;
+  currentUsername = null;
+  peerUserId = null;
+}
+
+function restoreSession() {
+  const id = Number(localStorage.getItem("currentUserId") || "0");
+  const username = localStorage.getItem("currentUsername");
+  if (id > 0 && username) {
+    currentUserId = id;
+    currentUsername = username;
+  }
+}
+
+function setScreens() {
+  const loggedIn = Boolean(currentUserId);
+  $("authScreen").hidden = loggedIn;
+  $("chatScreen").hidden = !loggedIn;
+  $("logoutBtn").hidden = !loggedIn;
+}
+
 async function loadUsers() {
   const q = $("userSearch").value.trim();
   const url = q ? `/api/users?q=${encodeURIComponent(q)}` : "/api/users";
   const res = await api(url);
-  if (!res.ok) throw new Error("Не удалось загрузить пользователей");
-  return res.json();
+  if (!res.ok) throw new Error("Failed to load users");
+  const users = await res.json();
+  usersCache = users;
+  return users;
 }
 
 function renderUsers(users) {
@@ -44,35 +79,13 @@ function renderUsers(users) {
     li.dataset.id = String(u.id);
     if (u.id === currentUserId) li.classList.add("active-me");
     if (u.id === peerUserId) li.classList.add("selected-peer");
-    li.addEventListener("click", (ev) => {
-      if (ev.ctrlKey || ev.metaKey) {
-        currentUserId = u.id;
-        peerUserId = peerUserId === u.id ? null : peerUserId;
-        $("chatPeerLabel").textContent = peerUserId
-          ? `Вы #${currentUserId}. Чат с #${peerUserId}`
-          : `Вы #${currentUserId}. Выберите собеседника обычным кликом.`;
-        if (peerUserId) {
-          startPoll();
-          refreshChat().catch(console.error);
-        } else {
-          stopPoll();
-          renderChat([]);
-        }
-        updateComposerState();
-        loadUsers().then(renderUsers).catch(console.error);
-        return;
-      }
-      if (!currentUserId) {
-        $("registerStatus").textContent =
-          "Сначала выберите «это я»: Ctrl+клик по своей строке в списке (после регистрации).";
-        return;
-      }
+    li.addEventListener("click", () => {
       if (u.id === currentUserId) {
-        $("chatPeerLabel").textContent = "Выберите другого пользователя для переписки (не себя).";
+        $("chatPeerLabel").textContent = "Pick another user (not yourself).";
         return;
       }
       peerUserId = u.id;
-      $("chatPeerLabel").textContent = `Переписка с ${u.username} (#${u.id})`;
+      $("chatPeerLabel").textContent = `Chat with ${u.username} (#${u.id})`;
       startPoll();
       refreshChat().catch(console.error);
       updateComposerState();
@@ -80,6 +93,36 @@ function renderUsers(users) {
     });
     ul.appendChild(li);
   });
+}
+
+async function login(ev) {
+  ev.preventDefault();
+  const fd = new FormData(ev.target);
+  const identifier = String(fd.get("identifier") || "").trim();
+  if (!identifier) return;
+  $("loginStatus").textContent = "Logging in…";
+
+  const res = await api(`/api/users?q=${encodeURIComponent(identifier)}`);
+  const users = await res.json().catch(() => []);
+  if (!res.ok) {
+    $("loginStatus").textContent = "Login failed";
+    return;
+  }
+  const termLower = identifier.toLowerCase();
+  const exact = (users || []).find(
+    (u) => String(u.username).toLowerCase() === termLower || String(u.email).toLowerCase() === termLower,
+  );
+  const user = exact || (users || [])[0];
+  if (!user) {
+    $("loginStatus").textContent = "User not found";
+    return;
+  }
+
+  saveSession(user);
+  setScreens();
+  $("loginStatus").textContent = "";
+  ev.target.reset();
+  await loadUsers().then(renderUsers);
 }
 
 async function register(ev) {
@@ -90,20 +133,18 @@ async function register(ev) {
     email: fd.get("email"),
     password: fd.get("password"),
   };
-  $("registerStatus").textContent = "Отправка…";
+  $("registerStatus").textContent = "Creating…";
   const res = await api("/api/users", { method: "POST", body: JSON.stringify(body) });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    $("registerStatus").textContent = data.detail || "Ошибка регистрации";
+    $("registerStatus").textContent = data.detail || "Registration failed";
     return;
   }
-  $("registerStatus").textContent = `Создан пользователь #${data.id}. Выберите собеседника в списке. Чтобы сменить «себя», используйте Ctrl+клик по нужному пользователю.`;
-  currentUserId = data.id;
-  peerUserId = null;
-  $("chatPeerLabel").textContent = `Вы #${data.id}. Выберите собеседника в списке.`;
-  updateComposerState();
+  saveSession(data);
+  $("registerStatus").textContent = "";
+  setScreens();
   ev.target.reset();
-  loadUsers().then(renderUsers).catch(console.error);
+  await loadUsers().then(renderUsers);
 }
 
 function conversationUrl() {
@@ -134,10 +175,12 @@ function renderChat(messages) {
     wrap.className = "msg " + (m.sender_id === currentUserId ? "me" : "them");
     const meta = document.createElement("div");
     meta.className = "msg-meta";
-    meta.textContent =
+    const name =
       m.sender_id === currentUserId
-        ? "Вы"
-        : `Пользователь #${m.sender_id}`;
+        ? currentUsername || "You"
+        : m.sender_username || `User #${m.sender_id}`;
+    const ts = formatTimestamp(m.created_at);
+    meta.textContent = `${name} • ${ts}`;
     const text = document.createElement("div");
     text.textContent = m.content;
     wrap.appendChild(meta);
@@ -145,6 +188,19 @@ function renderChat(messages) {
     win.appendChild(wrap);
   });
   win.scrollTop = win.scrollHeight;
+}
+
+function formatTimestamp(iso) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return String(iso);
+  return d.toLocaleString(undefined, {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 function stopPoll() {
@@ -179,7 +235,7 @@ async function sendMessage(ev) {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    alert(err.detail || "Не удалось отправить");
+    alert(err.detail || "Failed to send");
     return;
   }
   $("messageInput").value = "";
@@ -196,6 +252,7 @@ function onTyping() {
 }
 
 function wireEvents() {
+  $("loginForm").addEventListener("submit", (e) => login(e).catch(console.error));
   $("registerForm").addEventListener("submit", (e) => register(e).catch(console.error));
   $("refreshUsers").addEventListener("click", () =>
     loadUsers().then(renderUsers).catch(console.error),
@@ -215,6 +272,16 @@ function wireEvents() {
     msgSearch = "";
     refreshChat().catch(console.error);
   });
+
+  $("logoutBtn").addEventListener("click", () => {
+    stopPoll();
+    clearSession();
+    setScreens();
+    renderChat([]);
+    $("chatPeerLabel").textContent = "Pick a user on the left";
+    $("loginStatus").textContent = "";
+    $("registerStatus").textContent = "";
+  });
 }
 
 function debounce(fn, ms) {
@@ -227,9 +294,16 @@ function debounce(fn, ms) {
 
 initTheme();
 wireEvents();
-loadUsers()
-  .then(renderUsers)
-  .catch((e) => {
-    console.error(e);
-    $("registerStatus").textContent = "Нет связи с API. Запустите сервер: uvicorn app.main:app --reload";
-  });
+restoreSession();
+setScreens();
+
+if (currentUserId) {
+  loadUsers()
+    .then(renderUsers)
+    .catch((e) => {
+      console.error(e);
+    });
+} else {
+  // show only auth screen
+  $("loginStatus").textContent = "";
+}

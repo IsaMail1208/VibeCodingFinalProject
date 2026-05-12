@@ -58,6 +58,10 @@ body {
   gap: 1rem;
 }
 
+.layout.single {
+  grid-template-columns: 1fr;
+}
+
 @media (max-width: 720px) {
   .layout {
     grid-template-columns: 1fr;
@@ -69,6 +73,19 @@ body {
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 1rem 1rem 1.25rem;
+}
+
+.auth-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+@media (max-width: 720px) {
+  .auth-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .panel h2 {
