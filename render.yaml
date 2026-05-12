@@ -8,5 +8,9 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
+      # Render may default to a very new Python (e.g. 3.14) where some deps
+      # don't have wheels yet and require Rust builds. Pin to a stable version.
+      - key: PYTHON_VERSION
+        value: "3.12.3"
       - key: PYTHONUNBUFFERED
         value: "1"
