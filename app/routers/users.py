@@ -8,7 +8,10 @@ from app.schemas import UserCreate, UserOut
 from passlib.context import CryptContext
 
 router = APIRouter(prefix="/api/users", tags=["users"])
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# NOTE: passlib 1.7.4 + bcrypt 5.x are incompatible on some environments
+# (registration crashes during bcrypt backend self-check). pbkdf2_sha256 is
+# a safe built-in alternative that doesn't require the external bcrypt module.
+pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 
 
 def hash_password(password: str) -> str:

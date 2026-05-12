@@ -21,7 +21,7 @@
 ## Как запустить локально
 
 ```powershell
-cd "c:\Users\user\Desktop\Salymbekov University\2 курс\Vibe coding"
+cd "c:\Users\user\Desktop\Salymbekov University\2 курс\VibeCodingFinalProject"
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
@@ -68,7 +68,7 @@ _Добавьте изображения в репозиторий (наприм
 В этом проекте уже есть `.gitignore`. Если вы ещё не залили код на GitHub:
 
 ```powershell
-cd "c:\Users\user\Desktop\Salymbekov University\2 курс\Vibe coding"
+cd "c:\Users\user\Desktop\Salymbekov University\2 курс\VibeCodingFinalProject"
 
 # 1) На GitHub создайте пустой репозиторий (Public)
 # 2) Привяжите remote и отправьте код
