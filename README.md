@@ -14,7 +14,7 @@
 
 - Python 3.12+, FastAPI, Uvicorn  
 - SQLAlchemy 2, SQLite  
-- Pydantic, passlib (bcrypt)  
+- Pydantic, passlib (pbkdf2_sha256)  
 - Фронтенд: статические файлы без сборщика  
 - Тесты: pytest, httpx (TestClient)
 
@@ -80,6 +80,15 @@ git push -u origin main
 Если GitHub попросит авторизацию — используйте GitHub CLI или Personal Access Token.
 
 ## Render (деплой)
+
+Рекомендуемый вариант — **Blueprint** через файл `render.yaml` (он уже добавлен в репозиторий):
+
+1) Залейте код на GitHub (публичный репозиторий)
+2) Откройте Render → **New** → **Blueprint**
+3) Выберите ваш репозиторий и подтвердите создание сервиса
+4) После деплоя откройте сайт и проверьте `/api/health`
+
+Примечание про SQLite: на Render файловая система контейнера может быть временной. В `render.yaml` подключён **persistent disk** и задан `DATA_DIR=/var/data`, чтобы база сохранялась между перезапусками.
 
 Вариант 1 — как Python Web Service (без Docker):
 

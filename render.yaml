@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: vibe-chat
+    runtime: python
+    plan: free
+    autoDeploy: true
+    healthCheckPath: /api/health
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: DATA_DIR
+        value: /var/data
+    disk:
+      name: vibe-chat-data
+      mountPath: /var/data
+      sizeGB: 1
