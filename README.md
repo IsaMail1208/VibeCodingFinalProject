@@ -28,8 +28,6 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
-Откройте в браузере: `http://127.0.0.1:8000/`
-
 Open in browser: `http://127.0.0.1:8000/`
 
 Tests:
@@ -47,13 +45,11 @@ docker run -p 8000:8000 vibe-chat
 
 ## Live Website
 
-_TODO: replace with the real link after deployment (Render, etc.):_
-**https://your-app.onrender.com**
+**https://vibe-chat-hw8z.onrender.com**
 
 ## Demo Video (YouTube)
 
-_TODO: after recording a 2–3 minute demo, paste the link:_
-**https://www.youtube.com/watch?v=...**
+**https://youtu.be/oI9_1NhzgVo**
 
 ## Screenshots
 
@@ -67,19 +63,19 @@ _Add images to the repo (for example `docs/screenshot.png`) and link them here._
 
 ## GitHub (publish)
 
-В этом проекте уже есть `.gitignore`. Если вы ещё не залили код на GitHub:
+This project already includes a `.gitignore`. If you haven't pushed it to GitHub yet:
 
 ```powershell
 cd "c:\Users\user\Desktop\Salymbekov University\2 курс\VibeCodingFinalProject"
 
-# 1) На GitHub создайте пустой репозиторий (Public)
-# 2) Привяжите remote и отправьте код
+# 1) Create a new empty repo on GitHub (Public)
+# 2) Add remote and push
 git remote add origin https://github.com/<username>/<repo>.git
 git branch -M main
 git push -u origin main
 ```
 
-Если GitHub попросит авторизацию — используйте GitHub CLI или Personal Access Token.
+If GitHub asks for authentication, use GitHub CLI or a Personal Access Token.
 
 ## Render (deploy)
 
@@ -101,14 +97,14 @@ Manual setup (without Blueprint):
 
 ## API (quick reference)
 
-| Метод | Путь | Описание |
+| Method | Path | Description |
 |--------|------|-----------|
-| GET | `/api/health` | Проверка работы |
-| POST | `/api/users` | Регистрация |
-| GET | `/api/users?q=` | Список / поиск |
-| GET | `/api/users/{id}` | Один пользователь |
-| POST | `/api/messages` | Отправить сообщение |
-| GET | `/api/messages/conversation/{a}/{b}?search=` | История между двумя пользователями |
-| GET | `/api/messages` | Список с параметрами `sender_id`, `receiver_id`, `user_a`+`user_b`, `search` |
+| GET | `/api/health` | Health check |
+| POST | `/api/users` | Register user |
+| GET | `/api/users?q=` | List/search users |
+| GET | `/api/users/{id}` | Get a single user |
+| POST | `/api/messages` | Send a message |
+| GET | `/api/messages/conversation/{a}/{b}?search=` | Conversation history between two users |
+| GET | `/api/messages` | List messages with filters `sender_id`, `receiver_id`, `user_a`+`user_b`, `search` |
 
-Интерактивная документация: `http://127.0.0.1:8000/docs`
+Interactive docs: `http://127.0.0.1:8000/docs`
