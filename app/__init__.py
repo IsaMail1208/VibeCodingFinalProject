@@ -1,0 +1,1 @@
+# Chat website FastAPI application

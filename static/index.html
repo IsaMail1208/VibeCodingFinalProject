@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vibe Chat</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <h1>Vibe Chat</h1>
+        <div class="topbar-actions">
+          <button type="button" id="themeToggle" class="btn ghost" aria-label="Тема">
+            Тема
+          </button>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="panel users-panel">
+          <h2>Пользователи</h2>
+          <div class="register-block">
+            <h3>Регистрация</h3>
+            <form id="registerForm" class="stack">
+              <input name="username" placeholder="Имя пользователя" required minlength="1" />
+              <input name="email" type="email" placeholder="Email" required />
+              <input name="password" type="password" placeholder="Пароль" required minlength="4" />
+              <button type="submit" class="btn primary">Зарегистрироваться</button>
+            </form>
+            <p id="registerStatus" class="hint"></p>
+          </div>
+          <div class="login-block">
+            <h3>Войти как</h3>
+            <p class="hint"><strong>Ctrl+клик</strong> по себе в списке — «это я». Обычный клик по другому пользователю — открыть чат.</p>
+          </div>
+          <div class="search-row">
+            <input id="userSearch" type="search" placeholder="Поиск пользователей…" />
+            <button type="button" id="refreshUsers" class="btn ghost">Обновить</button>
+          </div>
+          <ul id="userList" class="user-list"></ul>
+        </section>
+
+        <section class="panel chat-panel">
+          <h2>Чат</h2>
+          <p id="chatPeerLabel" class="hint">Выберите собеседника слева</p>
+          <div class="search-row">
+            <input id="messageSearch" type="search" placeholder="Поиск в переписке…" />
+            <button type="button" id="applyMsgSearch" class="btn ghost">Искать</button>
+            <button type="button" id="clearMsgSearch" class="btn ghost">Сброс</button>
+          </div>
+          <div id="chatWindow" class="chat-window" aria-live="polite"></div>
+          <form id="sendForm" class="composer">
+            <textarea
+              id="messageInput"
+              rows="2"
+              placeholder="Сообщение (поддерживаются эмодзи 🙂)"
+              maxlength="8000"
+              disabled
+            ></textarea>
+            <button type="submit" class="btn primary" id="sendBtn" disabled>Отправить</button>
+          </form>
+          <p id="typingHint" class="hint typing-hint" hidden>Печатает…</p>
+        </section>
+      </main>
+    </div>
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>
